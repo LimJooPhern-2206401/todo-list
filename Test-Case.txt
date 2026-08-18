@@ -1,0 +1,15 @@
+Task 1:
+Task Name: Finish assignment
+Task Description: Complete the HTML project
+Task Priority: High Priority
+
+Task 2:
+Task Name: Buy groceries
+Task Description: -
+Task Priority: Medium Priority
+
+Task 3:
+Task Name: Make presentation slide
+Task Description: Ensure the slide is concise and informative
+Task Priority: Small Priority
+

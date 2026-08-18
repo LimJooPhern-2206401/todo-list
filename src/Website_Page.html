@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Focus List</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="container">
+    <h1>Focus List.</h1>
+    <p>A place for task arrangement!</p>
+
+    <!-- Show the count of in progress and completed task  -->
+    <div class="task-sections">
+      <div class="task-box"> TOTAL TASK
+        <span class="count" id="totalCount">0</span>
+      </div>
+
+      <div class="task-box"> IN PROGRESS
+        <span class="count" id="inProgressCount">0</span>
+      </div>
+
+      <div class="task-box">  COMPLETED
+        <span class="count" id="completedCount">0</span>
+      </div>
+    </div>
+
+    <div class = "bottom-section">
+      <!-- Create Task Form -->
+      <div class = "task-creation">
+        <form id="taskForm">
+          <p>CREATE A TASK</p>
+          <label for="taskName">Task Name:</label><br><br>
+          <input type="text" id="taskName" name="taskName"><br><br>
+          <label for="taskDescription">Task Description:</label><br><br>
+          <input type="text" id="taskDescription" name="taskDescription"><br><br>
+          <label for="taskPriority">Task Priority:</label><br><br>
+          <select id = "taskPriority" name = "taskPriority" required>
+            <option value="" disabled selected hidden>Select task priority</option>
+            <option value="High">High Priority</option>
+            <option value="Medium">Medium Priority</option>
+            <option value="Low">Low Priority</option>
+          </select><br><br>
+          <button class="add-new-task-button" type="submit">Add New Task</button>
+        </form>
+      </div>
+      
+      <!-- Task Created Show -->
+      <div class = task-list>
+        <p>YOUR TASK</p>
+        <div id="taskList"></div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const taskForm = document.getElementById("taskForm");
+    const taskList = document.getElementById("taskList");
+    const submitButton = document.querySelector(".add-new-task-button");
+
+    let editingTask = null;
+
+    function updateCounts() {
+      const tasks = document.querySelectorAll(".task-item");
+
+      document.getElementById("totalCount").textContent = tasks.length;
+
+      document.getElementById("inProgressCount").textContent =
+        document.querySelectorAll(
+          '.task-item[data-status="in-progress"]'
+        ).length;
+
+      document.getElementById("completedCount").textContent =
+        document.querySelectorAll(
+          '.task-item[data-status="completed"]'
+        ).length;
+    }
+
+    taskForm.addEventListener("submit", function (event) {
+      event.preventDefault();
+
+      const name = document.getElementById("taskName").value.trim();
+      const description = document.getElementById("taskDescription").value.trim();
+      const priority = document.getElementById("taskPriority").value;
+
+      // Task name is required to input
+      if (name === "") {
+        alert("Please enter a task name.");
+        return;
+      }
+
+      // Changing the task details after editing
+      if (editingTask) {
+        editingTask.querySelector("h3").textContent = name;
+        editingTask.querySelector("p").textContent = description || "No description";
+        editingTask.querySelector("span").textContent = priority + " Priority";
+        editingTask.dataset.priority = priority.toLowerCase();
+
+        editingTask = null;
+        // Change back the button to "Add new Task"
+        submitButton.textContent = "Add New Task";
+      } 
+      
+      else { 
+
+      const task = document.createElement("div");
+      task.className = "task-item";
+      task.dataset.status = "in-progress";
+      task.dataset.priority = priority.toLowerCase();
+      
+      // Output the task created
+      task.innerHTML = `
+        <div class="task-details">
+          <h3>${name}</h3>
+          <p>${description || "No description"}</p>
+
+          <div class="task-controls">
+            <span>${priority} Priority</span>
+            <div class="task-actions">
+              <button type="button" class="complete-task"> Mark as Completed</button>
+              <button type="button" class="edit-task">Edit</button>
+              <button type="button" class="delete-task">Delete</button>
+            </div>
+        </div>
+      `;
+      
+      // Mark the task as completed
+      task.querySelector(".complete-task").addEventListener("click", function () {
+        task.dataset.status = "completed";
+        this.textContent = "Completed";
+        this.disabled = true;
+        task.classList.add("completed");
+
+        updateCounts();
+      });
+
+      // Delete the task
+      task.querySelector(".delete-task").addEventListener("click", function () {
+        task.remove();
+        updateCounts();
+      });
+
+      // Edit the task
+      task.querySelector(".edit-task").addEventListener("click", function () {
+
+        // Read current task details
+        document.getElementById("taskName").value = task.querySelector("h3").textContent;
+
+        const savedDescription = task.querySelector("p").textContent;
+
+        document.getElementById("taskDescription").value =
+          savedDescription === "No description" ? "" : savedDescription;
+
+        document.getElementById("taskPriority").value =
+          task.dataset.priority.charAt(0).toUpperCase() +
+          task.dataset.priority.slice(1);
+
+        editingTask = task;
+        // Change button to "Save Changes"
+        submitButton.textContent = "Save Changes";
+
+      });
+
+      taskList.appendChild(task);
+      updateCounts();
+
+      }
+      
+      taskForm.reset();
+
+    });
+
+    
+
+  </script>
+
+
+</body>
+</html>
